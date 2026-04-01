@@ -1,0 +1,58 @@
+[
+  {
+    "id": "vessel-001",
+    "name": "MSC ANNA",
+    "mmsi": "255806421",
+    "type": "Container Ship",
+    "latitude": 17.5,
+    "longitude": 70.0
+  },
+  {
+    "id": "vessel-002",
+    "name": "FRONT HAKATA",
+    "mmsi": "538004558",
+    "type": "Crude Oil Tanker",
+    "latitude": 12.0,
+    "longitude": 72.8
+  },
+  {
+    "id": "vessel-003",
+    "name": "BW SINDH",
+    "mmsi": "563146400",
+    "type": "LPG Tanker",
+    "latitude": 8.5,
+    "longitude": 75.0
+  },
+  {
+    "id": "vessel-004",
+    "name": "MAERSK HANOI",
+    "mmsi": "477610400",
+    "type": "Cargo Vessel",
+    "latitude": 6.8,
+    "longitude": 79.5
+  },
+  {
+    "id": "vessel-005",
+    "name": "EAGLE VALENCE",
+    "mmsi": "563155700",
+    "type": "Oil/Chemical Tanker",
+    "latitude": 14.5,
+    "longitude": 84.0
+  },
+  {
+    "id": "vessel-006",
+    "name": "COSCO SHIPPING LEO",
+    "mmsi": "477156900",
+    "type": "Container Ship",
+    "latitude": 18.0,
+    "longitude": 87.5
+  },
+  {
+    "id": "vessel-007",
+    "name": "JBU OPAL",
+    "mmsi": "352002324",
+    "type": "Chemical Tanker",
+    "latitude": 19.5,
+    "longitude": 68.5
+  }
+]

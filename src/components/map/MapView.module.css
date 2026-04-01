@@ -1,0 +1,98 @@
+.mapWrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.mapContainer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.layerPanel {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  width: 260px;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.panelTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.layerToggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.layerToggle:last-child {
+  margin-bottom: 0;
+}
+
+.layerToggle input {
+  display: none;
+}
+
+.checkmark {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  position: relative;
+  transition: all 0.2s;
+}
+
+.layerToggle input:checked ~ .checkmark {
+  background: var(--teal);
+  border-color: var(--teal);
+}
+
+.layerToggle input:checked ~ .checkmark::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid var(--ocean-950);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.label {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.legend {
+  position: absolute;
+  bottom: 30px;
+  left: 24px;
+  padding: 16px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}

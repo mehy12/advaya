@@ -1,0 +1,68 @@
+[
+  {
+    "id": "ind-001",
+    "name": "Mumbai Chemical Works",
+    "type": "Chemical Manufacturing",
+    "latitude": 19.0000,
+    "longitude": 72.9000,
+    "pollutionFlags": 47,
+    "compliance": "RED",
+    "dischargeType": "chemical",
+    "permits": false
+  },
+  {
+    "id": "ind-002",
+    "name": "Vizag Municipal Outfall",
+    "type": "Municipal Infrastructure",
+    "latitude": 17.7000,
+    "longitude": 83.2500,
+    "pollutionFlags": 31,
+    "compliance": "RED",
+    "dischargeType": "sewage",
+    "permits": false
+  },
+  {
+    "id": "ind-003",
+    "name": "Jamnagar Industrial Corridor",
+    "type": "Petrochemical Processing",
+    "latitude": 22.4500,
+    "longitude": 69.1000,
+    "pollutionFlags": 22,
+    "compliance": "YELLOW",
+    "dischargeType": "thermal",
+    "permits": true
+  },
+  {
+    "id": "ind-004",
+    "name": "Kochi Harbor Facilities",
+    "type": "Port & Harbor",
+    "latitude": 9.9500,
+    "longitude": 76.2500,
+    "pollutionFlags": 12,
+    "compliance": "YELLOW",
+    "dischargeType": "oil",
+    "permits": true
+  },
+  {
+    "id": "ind-005",
+    "name": "Chennai Industrial Estate",
+    "type": "Mixed Manufacturing",
+    "latitude": 13.1500,
+    "longitude": 80.3000,
+    "pollutionFlags": 19,
+    "compliance": "YELLOW",
+    "dischargeType": "multiple",
+    "permits": true
+  },
+  {
+    "id": "ind-006",
+    "name": "Mangalore Sewage Network",
+    "type": "Municipal Infrastructure",
+    "latitude": 12.8500,
+    "longitude": 74.8800,
+    "pollutionFlags": 9,
+    "compliance": "GREEN",
+    "dischargeType": "sewage",
+    "permits": true
+  }
+]
