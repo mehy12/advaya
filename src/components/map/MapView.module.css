@@ -1,32 +1,33 @@
 .mapWrapper {
-  width: 100%;
-  height: 100%;
   position: relative;
-}
-
-.mapContainer {
-  position: absolute;
-  inset: 0;
   width: 100%;
-  height: 100%;
+  height: calc(100vh - var(--nav-height));
+  background: var(--slate-100);
+  overflow: hidden;
 }
 
+/* Layer Panel - Sharp Edges, White Bg */
 .layerPanel {
   position: absolute;
-  top: 24px;
-  left: 24px;
-  width: 260px;
-  padding: 20px;
+  top: 20px;
+  right: 20px;
   z-index: 1000;
+  width: 240px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-md);
+  border-radius: 0 !important; /* Force Sharp */
+  backdrop-filter: none !important;
 }
 
 .panelTitle {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-primary);
   margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--slate-500);
 }
 
 .layerToggle {
@@ -36,6 +37,9 @@
   margin-bottom: 12px;
   cursor: pointer;
   user-select: none;
+  font-size: 0.9rem;
+  color: var(--slate-700);
+  padding: 4px 0;
 }
 
 .layerToggle:last-child {
@@ -47,52 +51,58 @@
 }
 
 .checkmark {
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-card);
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--slate-300);
+  background: #ffffff;
   position: relative;
   transition: all 0.2s;
+  border-radius: 0 !important; /* Square checkbox */
 }
 
-.layerToggle input:checked ~ .checkmark {
-  background: var(--teal);
-  border-color: var(--teal);
+.layerToggle input:checked + .checkmark {
+  background: var(--slate-900);
+  border-color: var(--slate-900);
 }
 
-.layerToggle input:checked ~ .checkmark::after {
-  content: "";
+.layerToggle input:checked + .checkmark::after {
+  content: "✔";
   position: absolute;
-  left: 6px;
-  top: 2px;
-  width: 5px;
-  height: 10px;
-  border: solid var(--ocean-950);
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  font-size: 10px;
 }
 
 .label {
-  font-size: 0.95rem;
-  color: var(--text-primary);
+  font-weight: 500;
 }
 
+/* Legend - Sharp Edges, White Bg */
 .legend {
   position: absolute;
-  bottom: 30px;
-  left: 24px;
-  padding: 16px;
+  bottom: 20px;
+  right: 20px;
   z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-md);
+  border-radius: 0 !important;
+  width: 200px;
 }
 
 .legendItem {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-bottom: 8px;
+  color: var(--slate-700);
+  font-weight: 500;
+}
+
+.legendItem:last-child {
+  margin-bottom: 0;
 }

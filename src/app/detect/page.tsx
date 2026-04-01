@@ -8,9 +8,19 @@ import { FiCamera } from "react-icons/fi";
 
 export default function DetectPage() {
   const [file, setFile] = useState<File | null>(null);
-  const [base64, setBase64] = useState<string>("");
+  const [base64, setBase64] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
+
+  const readFileAsDataURL = (input: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(new Error("Failed to read file"));
+      reader.readAsDataURL(input);
+    });
+  };
 
   const handleUpload = async (file: File) => {
     setFile(file);
@@ -18,31 +28,34 @@ export default function DetectPage() {
     setResult(null);
 
     try {
-      // Convert to base64
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = async () => {
-        const resultBase64 = reader.result as string;
-        setBase64(resultBase64);
-        
-        // Strip data:image/...;base64,
-        const base64Data = resultBase64.split(',')[1];
-        const mimeType = file.type;
+      const resultBase64 = await readFileAsDataURL(file);
+      setBase64(resultBase64);
 
-        const res = await fetch("/api/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ image: base64Data, mimeType })
-        });
-        
-        if (!res.ok) throw new Error("Analysis failed");
-        
-        const data = await res.json();
-        setResult(data);
-      };
+      // Strip data:image/...;base64,
+      const base64Data = resultBase64.split(",")[1];
+      const mimeType = file.type;
+
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: base64Data, mimeType }),
+      });
+
+      if (!res.ok) {
+        const errorPayload = await res.json().catch(() => null);
+        const message =
+          errorPayload?.error ||
+          errorPayload?.details ||
+          `Analysis failed (${res.status})`;
+        throw new Error(message);
+      }
+
+      const data = await res.json();
+      setResult(data);
     } catch (error) {
       console.error(error);
-      alert("Failed to analyze image. Ensure Gemini API key is set.");
+      const message = error instanceof Error ? error.message : "Failed to analyze image.";
+      alert(message);
     } finally {
       // Keeping analyzing state true briefly for animation effect
       setTimeout(() => setAnalyzing(false), 500);
@@ -51,8 +64,9 @@ export default function DetectPage() {
 
   const clear = () => {
     setFile(null);
-    setBase64("");
+    setBase64(null);
     setResult(null);
+    setSelectedLocation(null);
   };
 
   return (
@@ -73,7 +87,7 @@ export default function DetectPage() {
         {file && analyzing && (
            <div className={`${styles.analyzingCard} glass animate-pulse`}>
               <div className={styles.imagePreview}>
-                 <img src={base64} alt="Preview" />
+                {base64 && <img src={base64} alt="Preview" />}
                  <div className={styles.scanningLine}></div>
               </div>
               <h3 style={{ marginTop: "20px", color: "var(--teal)" }}>Gemini Vision analyzing...</h3>
@@ -81,9 +95,15 @@ export default function DetectPage() {
            </div>
         )}
 
-        {file && result && !analyzing && (
+          {file && result && !analyzing && base64 && (
           <div className="animate-slide-up">
-            <AnalysisResult result={result} imageBase64={base64} onClear={clear} />
+            <AnalysisResult
+              result={result}
+              imageBase64={base64}
+              selectedLocation={selectedLocation}
+              onLocationChange={setSelectedLocation}
+              onClear={clear}
+            />
           </div>
         )}
       </div>

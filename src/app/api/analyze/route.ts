@@ -18,8 +18,14 @@ export async function POST(req: NextRequest) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    // Use the recommended model for vision tasks in v1.5
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const modelCandidates = [
+      "gemini-2.5-flash",
+      "gemini-2.0-flash",
+      "gemini-2.0-flash-exp",
+      "gemini-1.5-flash",
+      "gemini-1.5-pro",
+      "gemini-pro-vision",
+    ];
 
     const prompt = `
       You are an expert marine pollution analyst determining the nature of pollution from drone/phone photos.
@@ -36,15 +42,55 @@ export async function POST(req: NextRequest) {
       }
     `;
 
-    const result = await model.generateContent([
-      prompt,
-      {
-        inlineData: {
-          data: image,
-          mimeType: mimeType || "image/jpeg",
+    let result: Awaited<ReturnType<ReturnType<typeof genAI.getGenerativeModel>["generateContent"]>> | null = null;
+    const modelErrors: string[] = [];
+
+    for (const modelName of modelCandidates) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        result = await model.generateContent([
+          prompt,
+          {
+            inlineData: {
+              data: image,
+              mimeType: mimeType || "image/jpeg",
+            },
+          },
+        ]);
+        break;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Unknown model error";
+        modelErrors.push(`${modelName}: ${message}`);
+      }
+    }
+
+    if (!result) {
+      const quotaError = modelErrors.find(
+        (msg) =>
+          msg.includes("Quota exceeded") ||
+          msg.includes("Too Many Requests") ||
+          msg.includes("429")
+      );
+
+      if (quotaError) {
+        return Response.json(
+          {
+            error:
+              "Gemini API quota exceeded for this project. Enable billing or wait for quota reset, then retry.",
+            details: quotaError,
+          },
+          { status: 429 }
+        );
+      }
+
+      return Response.json(
+        {
+          error: "No supported Gemini model is available for this API key.",
+          details: modelErrors.join(" | ") || "Model invocation failed",
         },
-      },
-    ]);
+        { status: 502 }
+      );
+    }
 
     const text = result.response.text();
     let jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -61,10 +107,11 @@ export async function POST(req: NextRequest) {
     }
 
     return Response.json(parsedData);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Analysis Error:", error);
+    const message = error instanceof Error ? error.message : "Analysis failed";
     return Response.json(
-      { error: "Analysis failed", details: error.message },
+      { error: message, details: message },
       { status: 500 }
     );
   }
