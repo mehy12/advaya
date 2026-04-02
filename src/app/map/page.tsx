@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { FiCamera, FiTrendingUp } from "react-icons/fi";
 
 // Dynamically import the map component with SSR disabled
@@ -53,6 +53,18 @@ export default function MapPage() {
     liveUpdatedAt: string;
   } | null>(null);
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const update = () => {
+      if (typeof window === "undefined") return;
+      setIsMobile(window.innerWidth <= 768);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
   return (
     <div style={{ height: "calc(100vh - var(--nav-height))", position: "relative" }}>
       <Suspense fallback={<div>Loading Map...</div>}>
@@ -63,27 +75,29 @@ export default function MapPage() {
       <div
         style={{
           position: "absolute",
-          top: 18,
-          left: 24,
+          top: isMobile ? 12 : 18,
+          left: isMobile ? "50%" : 24,
+          transform: isMobile ? "translateX(-50%)" : undefined,
           zIndex: 1200,
           display: "flex",
           flexDirection: "column",
-          gap: 12,
+          gap: isMobile ? 10 : 12,
           alignItems: "flex-start",
-          maxWidth: 440,
+          maxWidth: isMobile ? "calc(100vw - 24px)" : 440,
+          width: isMobile ? "calc(100vw - 24px)" : undefined,
         }}
       >
         {/* Context + primary actions card */}
         <div
           style={{
             width: "100%",
-            padding: "14px 18px",
-            borderRadius: "14px",
-            background: "rgba(255, 255, 255, 0.9)",
-            backdropFilter: "blur(14px)",
+            padding: isMobile ? "12px 14px" : "14px 18px",
+            borderRadius: isMobile ? "18px" : "14px",
+            background: isMobile ? "rgba(255, 255, 255, 0.88)" : "rgba(255, 255, 255, 0.9)",
+            backdropFilter: isMobile ? "blur(18px)" : "blur(14px)",
             border: "1px solid var(--border-strong)",
             color: "var(--text-primary)",
-            boxShadow: "0 16px 40px rgba(15,23,42,0.18)",
+            boxShadow: isMobile ? "0 18px 45px rgba(15,23,42,0.32)" : "0 16px 40px rgba(15,23,42,0.18)",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "flex-start" }}>
@@ -205,13 +219,13 @@ export default function MapPage() {
         <div
           style={{
             width: "100%",
-            padding: "12px 16px",
-            borderRadius: "14px",
-            background: "rgba(255, 255, 255, 0.96)",
-            backdropFilter: "blur(14px)",
+            padding: isMobile ? "10px 14px" : "12px 16px",
+            borderRadius: isMobile ? "18px" : "14px",
+            background: isMobile ? "rgba(255, 255, 255, 0.9)" : "rgba(255, 255, 255, 0.96)",
+            backdropFilter: isMobile ? "blur(18px)" : "blur(14px)",
             border: "1px solid var(--border-strong)",
             color: "var(--text-primary)",
-            boxShadow: "0 16px 40px rgba(15,23,42,0.18)",
+            boxShadow: isMobile ? "0 18px 45px rgba(15,23,42,0.32)" : "0 16px 40px rgba(15,23,42,0.18)",
           }}
         >
           <div
@@ -225,7 +239,7 @@ export default function MapPage() {
           >
             Live Feed
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, maxHeight: 210, overflowY: "auto" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, maxHeight: isMobile ? 180 : 210, overflowY: "auto" }}>
             {(summary?.feedItems || []).map((item) => (
               <button
                 key={item.id}

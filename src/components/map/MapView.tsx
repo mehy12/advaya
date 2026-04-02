@@ -1,12 +1,16 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { MapContainer, TileLayer, Marker, Popup, CircleMarker, Tooltip, useMap, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, CircleMarker, Circle, Tooltip, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import styles from "./MapView.module.css";
 import cachedCurrentVectors from "@/data/current-vectors.json";
 import HeatmapLayer from "./HeatmapLayer";
+import { useBuoyFleet, BUOY_ALPHA_ZONES } from "@/hooks/useBuoySimulation";
+import type { BuoyConfig } from "@/hooks/useBuoySimulation";
+import BuoyLayer from "./BuoyLayer";
+import BuoyPanel from "./BuoyPanel";
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -394,59 +398,7 @@ function WaterHealthProbe(props: {
   );
 }
 
-function HeatmapGridPoints(
-  userReports: any[],
-  recentNodePhotos: any[]
-): Array<{ lat: number; lng: number; weight: number }> {
-  const sources = [
-    ...RIVER_MOUTHS.map((river) => ({ lat: river.lat, lng: river.lng, weight: river.severity === "critical" ? 1 : river.severity === "high" ? 0.8 : 0.6 })),
-    ...userReports
-      .filter((report) => report?.latitude != null && report?.longitude != null)
-      .map((report) => ({
-        lat: Number(report.latitude),
-        lng: Number(report.longitude),
-        weight: Math.min(1, Math.max(0.35, (Number(report.severity) || 3) / 5)),
-      })),
-    ...recentNodePhotos
-      .filter((photo) => photo?.latitude != null && photo?.longitude != null)
-      .map((photo) => ({
-        lat: Number(photo.latitude),
-        lng: Number(photo.longitude),
-        weight: photo.source === "analyzed_upload" ? 0.7 : 0.45,
-      })),
-  ];
-
-  const points: Array<{ lat: number; lng: number; weight: number }> = [];
-  const coastLng = 76.24;
-
-  // Very fine grid so the heatmap stays smooth even when zoomed in
-  for (let lat = 9.72; lat <= 10.28; lat += 0.008) {
-    for (let lng = 75.78; lng <= 76.58; lng += 0.012) {
-      const coastalDistanceKm = haversineKm(lat, lng, lat, coastLng);
-
-      // Strong red band hugging the coastline that decays offshore
-      const coastalBand = Math.exp(-coastalDistanceKm / 10); // ~1 at coast, ~0.14 at 20 km, ~0.02 at 40 km
-
-      const sourcePressure = sources.reduce((max, source) => {
-        const distanceKm = haversineKm(lat, lng, source.lat, source.lng);
-        const spread = Math.max(0, 1 - distanceKm / 20) * source.weight;
-        return Math.max(max, spread);
-      }, 0);
-
-      // Coastal band drives the general "red near land, greener offshore" feel,
-      // while sourcePressure punches in brighter pockets (including remote land spots).
-      let weight = coastalBand * 0.7 + sourcePressure * 0.95;
-      weight = Math.min(1, Math.max(0.02, weight));
-
-      // Skip very low-intensity ocean background, but always keep solid source-driven hotspots
-      if (weight > 0.09 || sourcePressure > 0.4) {
-        points.push({ lat, lng, weight });
-      }
-    }
-  }
-
-  return points;
-}
+// Heatmap logic removed as per request to replace with dynamic boat-driven zones
 
 export default function MapView({ refreshKey = 0, onSummaryChange }: MapViewProps) {
   const [baseLayer, setBaseLayer] = useState<BaseLayer>("light");
@@ -468,18 +420,147 @@ export default function MapView({ refreshKey = 0, onSummaryChange }: MapViewProp
   const [liveSource, setLiveSource] = useState("Open-Meteo Marine API");
   const [liveUpdatedAt, setLiveUpdatedAt] = useState(LIVE_CURRENT_DATA.metadata.date);
   const [focusTarget, setFocusTarget] = useState<{ lat: number; lng: number; zoom?: number } | null>(null);
+
+  // ── IoT Buoy Fleet ──
+  const [selectedBuoyId, setSelectedBuoyId] = useState<string | null>(null);
+
+  const buoyConfigs = useMemo<BuoyConfig[]>(() => [
+    { startOffset: 0.0 }, // buoy1 fallback (Alpha)
+    {
+      id: "harbor-patrol",
+      name: "Harbor Patrol Unit",
+      waypoints: [
+        { lat: 9.96, lng: 76.20, label: "Harbor Mouth" },
+        { lat: 9.94, lng: 76.19, label: "South Harbor" },
+        { lat: 9.91, lng: 76.18, label: "Outer Channel" },
+        { lat: 9.94, lng: 76.19, label: "South Harbor" }, // retrace
+      ],
+      zones: BUOY_ALPHA_ZONES,
+      startOffset: 0.35,
+    },
+    {
+      id: "offshore-sentinel",
+      name: "Offshore Sentinel",
+      waypoints: [
+        { lat: 10.04, lng: 76.14, label: "Cherai Beach" },
+        { lat: 10.08, lng: 76.12, label: "Offshore Cherai" },
+        { lat: 10.12, lng: 76.13, label: "Munambam Approach" },
+        { lat: 10.08, lng: 76.12, label: "Offshore Cherai" }, // retrace
+      ],
+      zones: BUOY_ALPHA_ZONES,
+      startOffset: 0.6,
+    },
+    {
+      id: "backwater-flow",
+      name: "Backwater Flow Monitor",
+      waypoints: [
+        { lat: 9.82, lng: 76.20, label: "Kumbalangi Coast" },
+        { lat: 9.78, lng: 76.18, label: "Aroor Approach" },
+        { lat: 9.76, lng: 76.17, label: "Offshore South" },
+        { lat: 9.78, lng: 76.18, label: "Aroor Approach" }, // retrace
+      ],
+      zones: BUOY_ALPHA_ZONES,
+      startOffset: 0.15,
+    },
+    {
+      id: "vembanad-core",
+      name: "Vembanad Core Node",
+      waypoints: [
+        { lat: 9.85, lng: 76.23, label: "Nettoor Port" },
+        { lat: 9.88, lng: 76.24, label: "Kumbalam Open" },
+        { lat: 9.92, lng: 76.25, label: "Panangad Channel" },
+        { lat: 9.88, lng: 76.24, label: "Kumbalam Open" }, // retrace
+      ],
+      zones: BUOY_ALPHA_ZONES,
+      startOffset: 0.8,
+    },
+    {
+      id: "periyar-scout",
+      name: "Periyar Estuary Scout",
+      waypoints: [
+        { lat: 10.10, lng: 76.19, label: "River Mouth" },
+        { lat: 10.08, lng: 76.20, label: "Estuary Zone" },
+        { lat: 10.06, lng: 76.21, label: "Inland Inlet" },
+        { lat: 10.08, lng: 76.20, label: "Estuary Zone" }, // retrace
+      ],
+      zones: BUOY_ALPHA_ZONES,
+      startOffset: 0.4,
+    },
+    {
+      id: "bolgatty-unit",
+      name: "Bolgatty Channel Unit",
+      waypoints: [
+        { lat: 9.99, lng: 76.19, label: "West Coast Ferry" },
+        { lat: 10.02, lng: 76.18, label: "Mulavukad Channel" },
+        { lat: 10.05, lng: 76.17, label: "North Beach Channel" },
+        { lat: 10.02, lng: 76.18, label: "Mulavukad Channel" }, // retrace
+      ],
+      zones: BUOY_ALPHA_ZONES,
+      startOffset: 0.25,
+    },
+    {
+      id: "edakochi-inland",
+      name: "Edakochi Inland Sensor",
+      waypoints: [
+        { lat: 9.90, lng: 76.21, label: "Thevara Coast" },
+        { lat: 9.87, lng: 76.20, label: "Kundannoor Outer" },
+        { lat: 9.84, lng: 76.19, label: "Kumbalangi Coast" },
+        { lat: 9.87, lng: 76.20, label: "Kundannoor Outer" }, // retrace
+      ],
+      zones: BUOY_ALPHA_ZONES,
+      startOffset: 0.55,
+    },
+    {
+      id: "deep-sea",
+      name: "Deep Sea Transponder",
+      waypoints: [
+        { lat: 10.00, lng: 76.05, label: "Arabian Sea North" },
+        { lat: 9.90, lng: 76.06, label: "Shipping Channel" },
+        { lat: 9.80, lng: 76.07, label: "Arabian Sea South" },
+        { lat: 9.90, lng: 76.06, label: "Shipping Channel" }, // retrace
+      ],
+      zones: BUOY_ALPHA_ZONES,
+      startOffset: 0.05,
+    }
+  ], []);
+
+  const allBuoys = useBuoyFleet(buoyConfigs);
+  const selectedBuoy = allBuoys.find((b) => b.id === selectedBuoyId) || null;
+
+  const handleBuoySelect = (id: string) => {
+    setSelectedBuoyId((prev) => (prev === id ? null : id));
+  };
   const satelliteDate = new Date().toISOString().split("T")[0];
 
   // Load reports and marine feed on mount, refresh button, and polling interval.
   useEffect(() => {
     let isCancelled = false;
 
-    const loadReports = () => {
-      if (typeof window === "undefined") return;
-      const saved = JSON.parse(localStorage.getItem("neptune_user_reports") || "[]");
-      const recentPhotos = getStoredNodePhotos();
-      setUserReports(saved);
-      setRecentNodePhotos(recentPhotos);
+    const loadReports = async () => {
+      let merged: any[] = [];
+
+      if (typeof window !== "undefined") {
+        const saved = JSON.parse(localStorage.getItem("neptune_user_reports") || "[]");
+        merged = saved;
+        const recentPhotos = getStoredNodePhotos();
+        setRecentNodePhotos(recentPhotos);
+      }
+
+      try {
+        const res = await fetch("/api/reports", { cache: "no-store" });
+        if (res.ok) {
+          const remote = await res.json();
+          // Prefer server data, with local fallback if empty
+          merged = Array.isArray(remote) && remote.length ? remote : merged;
+        }
+      } catch (error) {
+        console.error("Failed to load reports from server", error);
+      }
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem("neptune_user_reports", JSON.stringify(merged));
+      }
+      setUserReports(merged);
     };
 
     const loadMarineFeed = async () => {
@@ -600,22 +681,46 @@ export default function MapView({ refreshKey = 0, onSummaryChange }: MapViewProp
     return () => window.removeEventListener("neptune:focus-feed", listener);
   }, []);
 
-  const heatmapPoints = useMemo(() => HeatmapGridPoints(userReports, recentNodePhotos), [userReports, recentNodePhotos]);
-  // Treat the heatmap as a wide-area layer: only show it at
-  // more zoomed-out levels so it looks like a smooth coastal band
-  // and disappears before it turns into visible blobs/stripes.
-  const heatmapVisible = showHeatmap && zoom <= 13;
+  const [heatmapTick, setHeatmapTick] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setHeatmapTick((v) => v + 1), 2000);
+    return () => clearInterval(t);
+  }, []);
+
+  const heatmapPoints = useMemo(() => {
+    const points: Array<{ lat: number; lng: number; weight: number }> = [];
+    allBuoys.forEach(buoy => {
+      buoy.trail.forEach(t => {
+        // Paint blobs anywhere a boat detected health < 70
+        if (t.healthScore < 70) {
+          let weight = (70 - t.healthScore) / 40; 
+          points.push({ lat: t.lat, lng: t.lng, weight: Math.min(1, Math.max(0.1, weight)) });
+        }
+      });
+    });
+    return points;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [heatmapTick]);
+
+  const heatmapVisible = showHeatmap && heatmapPoints.length > 0;
 
   const handleProbe = (lat: number, lng: number) => {
     const data = evaluateWaterHealth(lat, lng);
     setProbeSnapshot({ lat, lng, data });
   };
 
-  const deleteCitizenReport = (reportId: string) => {
-    if (typeof window === "undefined") return;
-    const remaining = userReports.filter((report) => report.id !== reportId);
-    setUserReports(remaining);
-    localStorage.setItem("neptune_user_reports", JSON.stringify(remaining));
+  const deleteCitizenReport = async (reportId: string) => {
+    if (typeof window !== "undefined") {
+      const remaining = userReports.filter((report) => report.id !== reportId);
+      setUserReports(remaining);
+      localStorage.setItem("neptune_user_reports", JSON.stringify(remaining));
+    }
+
+    try {
+      await fetch(`/api/reports?id=${encodeURIComponent(String(reportId))}`, { method: "DELETE" });
+    } catch (error) {
+      console.error("Failed to delete report from server", error);
+    }
   };
 
   const kochiBounds: [number, number][] = [[9.6, 75.8], [10.3, 76.6]];
@@ -637,7 +742,10 @@ export default function MapView({ refreshKey = 0, onSummaryChange }: MapViewProp
         <BoundsEnforcer />
         <ZoomWatcher onZoomChange={setZoom} />
         <MapFocusController focusTarget={focusTarget} />
+        
+        {/* Dynamic Boat-Driven Danger Blobs (Heatmap) */}
         {heatmapVisible && <HeatmapLayer points={heatmapPoints} visible={heatmapVisible} />}
+
         <WaterHealthProbe enabled={enableProbe} snapshot={probeSnapshot} onProbe={handleProbe} />
 
         {/* River mouth pollution channels */}
@@ -817,7 +925,26 @@ export default function MapView({ refreshKey = 0, onSummaryChange }: MapViewProp
             </Popup>
           </Marker>
         ))}
+
+
+        {/* IoT Buoy Fleet — gliding markers + dotted trails when selected */}
+        {allBuoys.map((buoy) => (
+          <BuoyLayer
+            key={buoy.id}
+            buoy={buoy}
+            selected={buoy.id === selectedBuoyId}
+            onSelect={handleBuoySelect}
+          />
+        ))}
       </MapContainer>
+
+      {/* Buoy sensor panel — only when a buoy is selected/monitored */}
+      {selectedBuoy && (
+        <BuoyPanel
+          buoy={selectedBuoy}
+          onClose={() => setSelectedBuoyId(null)}
+        />
+      )}
 
       {/* Layer toggle */}
       <div className={styles.layerPanel}>
@@ -863,7 +990,7 @@ export default function MapView({ refreshKey = 0, onSummaryChange }: MapViewProp
           <label className={styles.layerToggle} style={{ marginBottom: 0 }}>
             <input type="checkbox" checked={showHeatmap} onChange={(e) => setShowHeatmap(e.target.checked)} />
             <span className={styles.checkmark}></span>
-            <span className={styles.label}>Pollution heatmap</span>
+            <span className={styles.label}>IoT Hazard Zones</span>
           </label>
           <label className={styles.layerToggle} style={{ marginTop: 4 }}>
             <input type="checkbox" checked={enableProbe} onChange={(e) => setEnableProbe(e.target.checked)} />
@@ -880,7 +1007,7 @@ export default function MapView({ refreshKey = 0, onSummaryChange }: MapViewProp
             <li>River Mouth Pollution Channels (5)</li>
             <li>Live Fishing Zone Marine Estimates (5)</li>
             <li>Citizen Anomaly Reports</li>
-            <li>{showHeatmap ? "Coastal Pollution Heatmap" : "Heatmap hidden"}</li>
+            <li>{showHeatmap ? "IoT Hazard Zones" : "Hazard Zones hidden"}</li>
             <li>{enableProbe ? "Water Health Probe" : "Probe off"}</li>
           </ul>
           <p style={{ margin: "10px 0 0 0", fontSize: "0.7rem", color: "var(--slate-400)" }}>

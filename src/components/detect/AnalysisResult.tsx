@@ -52,15 +52,13 @@ export default function AnalysisResult({ result, imageBase64, selectedLocation, 
     return <FiInfo style={{ color: "var(--amber)" }} />;
   };
 
-  const handleAddToMap = () => {
+  const handleAddToMap = async () => {
     if (!selectedLocation) {
       alert("Select a location first: use current location or drop a pin on the map.");
       return;
     }
 
-    const userReports = JSON.parse(localStorage.getItem("neptune_user_reports") || "[]");
-    const newReport = {
-      id: `user-${Date.now()}`,
+    const payload = {
       latitude: selectedLocation.lat,
       longitude: selectedLocation.lng,
       type: result.pollution_type.replace("_", " ").toUpperCase(),
@@ -69,16 +67,33 @@ export default function AnalysisResult({ result, imageBase64, selectedLocation, 
       description: result.description,
       imageBase64,
       timestamp: new Date().toISOString(),
-      isLive: false,
       isUserReport: true,
     };
 
-    localStorage.setItem("neptune_user_reports", JSON.stringify([newReport, ...userReports]));
+    try {
+      // Optimistically update localStorage so offline users still see their own reports
+      const userReports = JSON.parse(localStorage.getItem("neptune_user_reports") || "[]");
+      const localReport = { id: `user-${Date.now()}`, ...payload, isLive: false };
+      localStorage.setItem("neptune_user_reports", JSON.stringify([localReport, ...userReports]));
 
-    const updatedPoints = addPoints(10);
-    setUserPoints(updatedPoints.totalPoints);
+      const res = await fetch("/api/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    alert(`✓ Report submitted! You earned 10 points. Total: ${updatedPoints.totalPoints} pts`);
+      if (!res.ok) {
+        console.error("Failed to sync report to NeonDB", await res.text());
+      }
+
+      const updatedPoints = addPoints(10);
+      setUserPoints(updatedPoints.totalPoints);
+
+      alert(`✓ Report submitted! You earned 10 points. Total: ${updatedPoints.totalPoints} pts`);
+    } catch (error) {
+      console.error(error);
+      alert("Report saved locally, but syncing to the server failed.");
+    }
   };
 
   const useCurrentLocation = () => {
