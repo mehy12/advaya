@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import { AuthProvider } from "@/context/AuthContext";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -33,8 +34,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable} data-scroll-behavior="smooth">
       <body>
-        <Navbar />
-        <main style={{ paddingTop: "var(--nav-height)" }}>{children}</main>
+        <AuthProvider>
+          <Navbar />
+          <main style={{ paddingTop: "var(--nav-height)" }}>{children}</main>
+        </AuthProvider>
       </body>
     </html>
   );

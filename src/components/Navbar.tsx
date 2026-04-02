@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { FiMap, FiCamera, FiTrendingUp, FiActivity, FiShield, FiAward, FiBookOpen, FiMenu, FiX } from "react-icons/fi";
+import { useAuth } from "@/context/AuthContext";
+import { FiMap, FiCamera, FiTrendingUp, FiActivity, FiShield, FiAward, FiBookOpen, FiMenu, FiX, FiLogOut, FiUser } from "react-icons/fi";
 import styles from "./Navbar.module.css";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   const navLinks = [
     { name: "Live Map", href: "/map", icon: <FiMap /> },
@@ -47,6 +49,25 @@ export default function Navbar() {
               </Link>
             );
           })}
+          
+          <div className={styles.authSection}>
+            {user ? (
+              <div className={styles.userProfile}>
+                <span className={styles.avatar}>{user.avatar}</span>
+                <div className={styles.userInfo}>
+                  <span className={styles.userName}>{user.name}</span>
+                  <span className={styles.userRole}>{user.role}</span>
+                </div>
+                <button onClick={logout} className={styles.logoutBtn} title="Logout">
+                  <FiLogOut />
+                </button>
+              </div>
+            ) : (
+              <Link href="/login" className={styles.loginBtn} onClick={() => setMobileOpen(false)}>
+                <FiUser /> <span>Sign In</span>
+              </Link>
+            )}
+          </div>
         </div>
 
         <button

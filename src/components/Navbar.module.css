@@ -92,33 +92,151 @@
 @media (max-width: 900px) {
   .navLinks {
     position: fixed;
-    top: var(--nav-height);
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(12px);
+    background: #ffffff;
     flex-direction: column;
     align-items: stretch;
-    padding: 20px;
+    justify-content: flex-start;
+    padding: 80px 24px 40px;
     gap: 4px;
     transform: translateX(100%);
-    transition: transform 0.3s var(--ease-standard);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 9998;
+    overflow-y: auto;
   }
 
   .navLinksOpen {
     transform: translateX(0);
+    box-shadow: -10px 0 30px rgba(0,0,0,0.1);
   }
 
   .navLink {
-    font-size: 1rem;
-    padding: 14px 16px;
+    font-size: 1.1rem;
+    padding: 16px 20px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+  }
+
+  .navLink.active {
+    background: rgba(13, 148, 136, 0.05);
+    border-color: rgba(13, 148, 136, 0.1);
   }
 
   .hamburger {
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 9999;
+    position: relative;
+  }
+}
+
+/* Auth Styles */
+.authSection {
+  margin-left: 20px;
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+  border-left: 1px solid var(--border-subtle);
+}
+
+.loginBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--slate-900);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.loginBtn:hover {
+  background: #000;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.userProfile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--slate-50);
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+}
+
+.avatar {
+  font-size: 1.2rem;
+  background: #fff;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.userRole {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--teal);
+  line-height: 1.2;
+}
+
+.logoutBtn {
+  margin-left: 4px;
+  padding: 6px;
+  color: #ef4444;
+  font-size: 1rem;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  transform: scale(1.1);
+}
+
+@media (max-width: 900px) {
+  .authSection {
+    margin: 20px 0 0 0;
+    padding: 20px 0 0 0;
+    border-left: none;
+    border-top: 1px solid var(--border-subtle);
+  }
+  
+  .loginBtn {
+    width: 100%;
+    justify-content: center;
+    padding: 16px;
+    font-size: 1rem;
+  }
+  
+  .userProfile {
+    width: 100%;
+    padding: 16px;
+    justify-content: space-between;
   }
 }

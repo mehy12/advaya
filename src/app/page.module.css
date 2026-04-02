@@ -249,15 +249,100 @@
 
 .closingQuote::before { content: '"'; display: none; }
 
-/* ── Responsive ─────────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .title { font-size: 1.75rem; }
-  .subtitle { font-size: 0.9rem; }
-  .statsGrid { grid-template-columns: repeat(2, 1fr); }
-  .loopGrid { grid-template-columns: repeat(2, 1fr); }
-  .featureGrid { grid-template-columns: 1fr; }
-  .moatCard { flex-direction: column; text-align: center; }
-  .moatArrow { transform: rotate(90deg); }
-  .closingQuote { font-size: 0.95rem; }
-  .closingCard { padding: 24px 20px; }
+/* ── Responsive Refinements — The "Guardian" Pass ── */
+@media (max-width: 900px) {
+  .hero {
+    padding: 100px 20px 40px;
+    text-align: center;
+  }
+
+  .title {
+    font-size: 2.2rem;
+    line-height: 1;
+    margin-bottom: 20px;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+  }
+
+  .ctaGroup {
+    flex-direction: column;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: 40px;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .loopGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    background: transparent;
+    border: none;
+  }
+
+  .loopCard {
+    border-radius: 16px;
+    border: 1px solid var(--border-subtle);
+    padding: 32px 24px;
+  }
+
+  .featureGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    background: transparent;
+    border: none;
+  }
+
+  .featureCard {
+    border-radius: 20px;
+    border: 1px solid var(--border-subtle);
+    padding: 32px 24px;
+  }
+
+  .moatsGrid {
+    border: none;
+    gap: 12px;
+  }
+
+  .moatCard {
+    border-radius: 12px;
+    border: 1px solid var(--border-subtle);
+    flex-direction: column;
+    text-align: left;
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  .moatArrow {
+    align-self: center;
+    transform: rotate(90deg);
+    margin: 4px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.8rem;
+  }
+  
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .statCard {
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .statCard:last-child {
+    border-bottom: none;
+  }
 }
