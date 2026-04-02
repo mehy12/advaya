@@ -11,6 +11,7 @@ import { useBuoyFleet, BUOY_ALPHA_ZONES } from "@/hooks/useBuoySimulation";
 import type { BuoyConfig } from "@/hooks/useBuoySimulation";
 import BuoyLayer from "./BuoyLayer";
 import BuoyPanel from "./BuoyPanel";
+import { FiMaximize2, FiMinimize2 } from "react-icons/fi";
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -426,6 +427,8 @@ export default function MapView({ refreshKey = 0, onSummaryChange }: MapViewProp
 
   // ── IoT Buoy Fleet ──
   const [selectedBuoyId, setSelectedBuoyId] = useState<string | null>(null);
+  const [isLayerPanelCollapsed, setIsLayerPanelCollapsed] = useState(false);
+  const [isLegendCollapsed, setIsLegendCollapsed] = useState(false);
 
   const buoyConfigs = useMemo<BuoyConfig[]>(() => [
     { startOffset: 0.0 }, // buoy1 fallback (Alpha)
@@ -956,35 +959,45 @@ export default function MapView({ refreshKey = 0, onSummaryChange }: MapViewProp
       )}
 
       {/* Layer toggle */}
-      <div className={styles.layerPanel}>
-        <div style={{ 
-          marginBottom: 16, 
-          padding: "12px", 
-          background: "rgba(14, 165, 233, 0.05)", 
-          border: "1px solid rgba(14, 165, 233, 0.2)", 
-          borderRadius: "12px" 
-        }}>
-          <p style={{ fontSize: "0.75rem", color: "#0369a1", fontWeight: 700, margin: "0 0 4px 0", textTransform: "uppercase" }}>
-            Fleet Status
-          </p>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--text-primary)" }}>{fleetStats.total}</div>
-              <div style={{ fontSize: "0.6rem", color: "var(--text-secondary)", fontWeight: 600 }}>NODES ONLINE</div>
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: "1.2rem", fontWeight: 800, color: fleetStats.polluted > 0 ? "var(--red)" : "var(--teal)" }}>
-                {fleetStats.polluted}
-              </div>
-              <div style={{ fontSize: "0.6rem", color: "var(--text-secondary)", fontWeight: 600 }}>IN POLLUTION</div>
-            </div>
+      <div className={`${styles.layerPanel} ${isLayerPanelCollapsed ? styles.minimized : ""}`}>
+        <div 
+          className={styles.panelHeader} 
+          onClick={() => setIsLayerPanelCollapsed(!isLayerPanelCollapsed)}
+          style={{ marginBottom: isLayerPanelCollapsed ? 0 : 20 }}
+        >
+          <h3 className={styles.panelTitle} style={{ marginBottom: 0 }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#0ea5e9", boxShadow: "0 0 8px #0ea5e9" }} />
+            Map Layers
+          </h3>
+          <div className={styles.toggleBtn}>
+            {isLayerPanelCollapsed ? <FiMaximize2 size={12} /> : <FiMinimize2 size={12} />}
           </div>
         </div>
 
-        <h3 className={styles.panelTitle}>
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#0ea5e9", boxShadow: "0 0 8px #0ea5e9" }} />
-          Map Layers
-        </h3>
+        <div className={`${styles.panelContent} ${isLayerPanelCollapsed ? styles.collapsedContent : ""}`}>
+          <div style={{ 
+            marginBottom: 16, 
+            padding: "12px", 
+            background: "rgba(14, 165, 233, 0.05)", 
+            border: "1px solid rgba(14, 165, 233, 0.2)", 
+            borderRadius: "12px" 
+          }}>
+            <p style={{ fontSize: "0.75rem", color: "#0369a1", fontWeight: 700, margin: "0 0 4px 0", textTransform: "uppercase" }}>
+              Fleet Status
+            </p>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--text-primary)" }}>{fleetStats.total}</div>
+                <div style={{ fontSize: "0.6rem", color: "var(--text-secondary)", fontWeight: 600 }}>NODES ONLINE</div>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: "1.2rem", fontWeight: 800, color: fleetStats.polluted > 0 ? "var(--red)" : "var(--teal)" }}>
+                  {fleetStats.polluted}
+                </div>
+                <div style={{ fontSize: "0.6rem", color: "var(--text-secondary)", fontWeight: 600 }}>IN POLLUTION</div>
+              </div>
+            </div>
+          </div>
 
         <div style={{ marginBottom: 16 }}>
           <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)", margin: "0 0 8px 0", fontWeight: "600" }}>
@@ -1049,51 +1062,62 @@ export default function MapView({ refreshKey = 0, onSummaryChange }: MapViewProp
             <span className={styles.label}>Water health probe</span>
           </label>
         </div>
-
       </div>
+    </div>
 
       {/* Legend */}
-      <div className={styles.legend}>
-        <h4 style={{ margin: "0 0 12px 0", fontSize: "0.9rem", fontWeight: "600", color: "var(--text-primary)" }}>
-          Legend
-        </h4>
-
-        <div style={{ marginBottom: "16px", borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: "12px" }}>
-          <p style={{ margin: "0 0 10px 0", fontSize: "0.75rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            River Mouths
-          </p>
-          <div className={styles.legendItem}>
-            <span className={styles.legendIndicator} style={{ color: "#DC2626" }} />
-            Critical Level
-          </div>
-          <div className={styles.legendItem}>
-            <span className={styles.legendIndicator} style={{ color: "#EA580C" }} />
-            High Pollution
-          </div>
-          <div className={styles.legendItem}>
-            <span className={styles.legendIndicator} style={{ color: "#F59E0B" }} />
-            Medium Impact
+      <div className={`${styles.legend} ${isLegendCollapsed ? styles.minimized : ""}`}>
+        <div 
+          className={styles.panelHeader} 
+          onClick={() => setIsLegendCollapsed(!isLegendCollapsed)}
+          style={{ marginBottom: isLegendCollapsed ? 0 : 12 }}
+        >
+          <h4 style={{ margin: 0, fontSize: "0.9rem", fontWeight: "600", color: "var(--text-primary)" }}>
+            Legend
+          </h4>
+          <div className={styles.toggleBtn}>
+            {isLegendCollapsed ? <FiMaximize2 size={12} /> : <FiMinimize2 size={12} />}
           </div>
         </div>
 
-        <div>
-          <p style={{ margin: "0 0 10px 0", fontSize: "0.75rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            Fleet Indicators
-          </p>
-          <div className={styles.legendItem}>
-            <span className={styles.legendIndicator} style={{ color: "#10B981" }} />
-            Healthy Zone
+        <div className={`${styles.panelContent} ${isLegendCollapsed ? styles.collapsedContent : ""}`} style={{ marginTop: 0 }}>
+          <div style={{ marginBottom: "16px", borderBottom: "1px solid rgba(0,0,0,0.05)", paddingBottom: "12px" }}>
+            <p style={{ margin: "0 0 10px 0", fontSize: "0.75rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              River Mouths
+            </p>
+            <div className={styles.legendItem}>
+              <span className={styles.legendIndicator} style={{ color: "#DC2626" }} />
+              Critical Level
+            </div>
+            <div className={styles.legendItem}>
+              <span className={styles.legendIndicator} style={{ color: "#EA580C" }} />
+              High Pollution
+            </div>
+            <div className={styles.legendItem}>
+              <span className={styles.legendIndicator} style={{ color: "#F59E0B" }} />
+              Medium Impact
+            </div>
           </div>
-          <div className={styles.legendItem}>
-            <span className={styles.legendIndicator} style={{ color: "#F59E0B" }} />
-            Moderate Activity
-          </div>
-          <div className={styles.legendItem}>
-            <span className={styles.legendIndicator} style={{ color: "#DC2626" }} />
-            Pollution Detected
-          </div>
-          <div style={{ marginTop: "12px", fontSize: "0.65rem", color: "#94a3b8", lineHeight: 1.4 }}>
-            System updates every 5s • Processing 9 high-precision IoT nodes.
+
+          <div>
+            <p style={{ margin: "0 0 10px 0", fontSize: "0.75rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              Fleet Indicators
+            </p>
+            <div className={styles.legendItem}>
+              <span className={styles.legendIndicator} style={{ color: "#10B981" }} />
+              Healthy Zone
+            </div>
+            <div className={styles.legendItem}>
+              <span className={styles.legendIndicator} style={{ color: "#F59E0B" }} />
+              Moderate Activity
+            </div>
+            <div className={styles.legendItem}>
+              <span className={styles.legendIndicator} style={{ color: "#DC2626" }} />
+              Pollution Detected
+            </div>
+            <div style={{ marginTop: "12px", fontSize: "0.65rem", color: "#94a3b8", lineHeight: 1.4 }}>
+              System updates every 5s • Processing 9 nodes.
+            </div>
           </div>
         </div>
       </div>

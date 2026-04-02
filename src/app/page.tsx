@@ -37,12 +37,12 @@ export default function Home() {
             <p>Active Threat Zones</p>
           </div>
           <div className={`${styles.statCard} glass`}>
-            <h3 style={{ color: "var(--amber-light)" }}>847</h3>
-            <p>Guardian Credits This Week</p>
+            <h3 style={{ color: "var(--teal-light)" }}>24/7</h3>
+            <p>Live Monitoring</p>
           </div>
           <div className={`${styles.statCard} glass`}>
-            <h3 style={{ color: "var(--teal-light)" }}>94.2%</h3>
-            <p>AI Trace Accuracy</p>
+            <h3 style={{ color: "var(--amber-light)" }}>847</h3>
+            <p>Guardian Credits This Week</p>
           </div>
           <div className={`${styles.statCard} glass`}>
             <h3 style={{ color: "var(--coral)" }}>6</h3>
@@ -60,9 +60,8 @@ export default function Home() {
         <div className={styles.loopGrid}>
           {[
             { step: "01", label: "Report", desc: "Anonymous, encrypted, zero-knowledge", icon: <FiShield />, color: "var(--teal)" },
-            { step: "02", label: "Trace", desc: "AI reverses ocean currents to find the source", icon: <FiTrendingUp />, color: "var(--blue)" },
-            { step: "03", label: "Predict", desc: "30/60/90 day species loss forecast", icon: <FiActivity />, color: "var(--purple)" },
-            { step: "04", label: "Reward", desc: "Guardian Credits redeemable for govt benefits", icon: <FiAward />, color: "var(--guardian-gold)" },
+            { step: "02", label: "Predict", desc: "30/60/90 day species loss forecast", icon: <FiActivity />, color: "var(--purple)" },
+            { step: "03", label: "Reward", desc: "Guardian Credits redeemable for govt benefits", icon: <FiAward />, color: "var(--guardian-gold)" },
           ].map((item) => (
             <div key={item.step} className={`${styles.loopCard} glass animate-slide-up stagger-item`}>
               <div className={styles.stepNumber} style={{ color: item.color }}>{item.step}</div>
@@ -79,7 +78,7 @@ export default function Home() {
         <h2 className="text-gradient" style={{ textAlign: "center", marginBottom: "2.5rem" }}>Why OceanSentinel Wins</h2>
         <div className={styles.moatsGrid}>
           {[
-            { bad: "Report pollution → nothing happens", good: "Report → AI traces source → authority notified + reporter rewarded" },
+            { bad: "Report pollution → nothing happens", good: "Report → authority notified + reporter rewarded" },
             { bad: "Show current pollution levels", good: "Predict which species die in 30/60/90 days if nothing changes" },
             { bad: "Fear of reporting — identity exposed", good: "Zero-knowledge anonymous reports — cryptographically safe" },
             { bad: "Fishermen have no incentive to engage", good: "Govt scheme credits for verified reports + clean-zone fishing licenses" },
@@ -99,9 +98,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 4 Pillar Feature Cards ────────────────────────────── */}
+      {/* ── 3 Pillar Feature Cards ────────────────────────────── */}
       <section className={styles.features}>
-        <h2 className="text-gradient" style={{ textAlign: "center", marginBottom: "2.5rem" }}>The 4 Pillars</h2>
+        <h2 className="text-gradient" style={{ textAlign: "center", marginBottom: "2.5rem" }}>The 3 Pillars</h2>
         <div className={styles.featureGrid}>
           <Link href="/report" className={`${styles.featureCard} glass-strong animate-slide-up stagger-item`}>
             <div className={styles.iconWrapper} style={{ background: "rgba(20, 184, 166, 0.15)", color: "var(--teal-light)" }}>
@@ -110,15 +109,6 @@ export default function Home() {
             <h3>Anonymous Reporting</h3>
             <p>Zero-knowledge proof identity. End-to-end encrypted media. Persistent Guardian ID without exposure. Even we can't identify you.</p>
             <span className={styles.cardCta}>File Report <FiArrowRight /></span>
-          </Link>
-
-          <Link href="/tracer" className={`${styles.featureCard} glass-strong animate-slide-up stagger-item`}>
-            <div className={styles.iconWrapper} style={{ background: "rgba(59, 130, 246, 0.15)", color: "var(--ocean-300)" }}>
-              <FiTrendingUp className="icon" />
-            </div>
-            <h3>Root Cause AI</h3>
-            <p>Reverse-current dispersion model traces pollution to its source. Cross-references discharge permits, AIS vessel logs, and historical data.</p>
-            <span className={styles.cardCta}>Run Trace <FiArrowRight /></span>
           </Link>
 
           <Link href="/biodiversity" className={`${styles.featureCard} glass-strong animate-slide-up stagger-item`}>

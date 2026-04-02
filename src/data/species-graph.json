@@ -1,48 +1,41 @@
 {
   "nodes": [
-    { "id": "coral", "name": "Coral Reefs", "kingdom": "Cnidaria", "population": 100, "threshold": 60, "economicValue": 4200, "icon": "🪸", "color": "#ff6b6b", "description": "Foundation species — provides habitat structure for 70% of marine life in Gulf of Mannar" },
-    { "id": "seagrass", "name": "Seagrass Beds", "kingdom": "Plantae", "population": 100, "threshold": 50, "economicValue": 1800, "icon": "🌿", "color": "#10b981", "description": "Marine meadows — nursery habitat for juvenile fish and sea turtles" },
-    { "id": "plankton", "name": "Phytoplankton", "kingdom": "Protista", "population": 100, "threshold": 40, "economicValue": 800, "icon": "🦠", "color": "#60a5e8", "description": "Base of the food chain — produces 50% of oxygen, feeds everything above" },
-    { "id": "sea_cucumber", "name": "Sea Cucumbers", "kingdom": "Echinodermata", "population": 100, "threshold": 55, "economicValue": 2200, "icon": "🥒", "color": "#8b5cf6", "description": "Ocean vacuums — recycle nutrients, clean sediment, maintain water quality" },
-    { "id": "juvenile_fish", "name": "Juvenile Fish", "kingdom": "Fish", "population": 100, "threshold": 45, "economicValue": 3500, "icon": "🐟", "color": "#ffc107", "description": "Recruit stock — depend on coral/seagrass nurseries for survival" },
-    { "id": "adult_fish", "name": "Adult Fish Stock", "kingdom": "Fish", "population": 100, "threshold": 35, "economicValue": 8500, "icon": "🐠", "color": "#f97316", "description": "Commercial fishery — sustains 400+ fishermen families in the region" },
-    { "id": "sea_turtle", "name": "Sea Turtles", "kingdom": "Reptilia", "population": 100, "threshold": 50, "economicValue": 1200, "icon": "🐢", "color": "#84cc16", "description": "Endangered keystone — nests on beaches, feeds on seagrass and jellyfish" },
-    { "id": "dolphin", "name": "Indo-Pacific Dolphins", "kingdom": "Mammalia", "population": 100, "threshold": 30, "economicValue": 3200, "icon": "🐬", "color": "#00d2d3", "description": "Apex predator — indicator species, tourism value, ecosystem balance" },
-    { "id": "shark", "name": "Reef Sharks", "kingdom": "Fish", "population": 100, "threshold": 25, "economicValue": 2800, "icon": "🦈", "color": "#64748b", "description": "Top predator — maintains mid-level fish populations, prevents overgrazing" }
+    { "id": "mangrove", "name": "Mangrove Forests (Kandal)", "kingdom": "Plantae", "population": 100, "threshold": 60, "economicValue": 5500, "icon": "🌳", "color": "#15803d", "description": "Critical nursery — protects 80% of estuarine fish and prawns in Vembanad Lake" },
+    { "id": "seagrass", "name": "Ashtamudi Seagrasses", "kingdom": "Plantae", "population": 100, "threshold": 50, "economicValue": 1800, "icon": "🌿", "color": "#10b981", "description": "Feeding ground — essential for juvenile turtles and indigenous pearl spots" },
+    { "id": "chakara", "name": "Marine Biomass (Chakara)", "kingdom": "Protista", "population": 100, "threshold": 40, "economicValue": 4200, "icon": "🌊", "color": "#60a5e8", "description": "Unique Kerala Mudbanks — rich nutrient surges that drive the fishing season" },
+    { "id": "kaka", "name": "Black Clams (Kaka)", "kingdom": "Mollusca", "population": 100, "threshold": 55, "economicValue": 2500, "icon": "🐚", "color": "#8b5cf6", "description": "Benthic filters — maintain water clarity in Kerala's backwater network" },
+    { "id": "karimeen", "name": "Pearl Spot (Karimeen)", "kingdom": "Fish", "population": 100, "threshold": 45, "economicValue": 6800, "icon": "🐟", "color": "#ffc107", "description": "State fish of Kerala — crucial for local markets and ecological balance" },
+    { "id": "fish_stock", "name": "Mathi & Ayila (Sardines)", "kingdom": "Fish", "population": 100, "threshold": 35, "economicValue": 12500, "icon": "🐠", "color": "#f97316", "description": "Primary commercial stock — sustains 2500+ traditional fishing families" },
+    { "id": "turtle", "name": "Olive Ridley (Kerala Coast)", "kingdom": "Reptilia", "population": 100, "threshold": 50, "economicValue": 1200, "icon": "🐢", "color": "#84cc16", "description": "Endangered traveler — uses Kerala beaches for critical nesting every year" },
+    { "id": "dolphin", "name": "Humpback Dolphins", "kingdom": "Mammalia", "population": 100, "threshold": 30, "economicValue": 3200, "icon": "🐬", "color": "#00d2d3", "description": "Indicator species — presence signifies health of Kochi and Kozhikode shallows" },
+    { "id": "prawns", "name": "Malabar Prawns (Chemmeen)", "kingdom": "Arthropoda", "population": 100, "threshold": 25, "economicValue": 9800, "icon": "🦐", "color": "#ff7675", "description": "Export powerhouse — depend on pristine estuarine water quality for growth" }
   ],
   "edges": [
-    { "source": "coral", "target": "seagrass", "strength": 0.7, "label": "provides shelter" },
-    { "source": "coral", "target": "juvenile_fish", "strength": 0.9, "label": "nursery habitat" },
-    { "source": "coral", "target": "sea_cucumber", "strength": 0.6, "label": "reef structure" },
-    { "source": "seagrass", "target": "juvenile_fish", "strength": 0.8, "label": "feeding ground" },
-    { "source": "seagrass", "target": "sea_turtle", "strength": 0.85, "label": "primary food" },
-    { "source": "plankton", "target": "juvenile_fish", "strength": 0.7, "label": "food source" },
-    { "source": "plankton", "target": "coral", "strength": 0.5, "label": "nutrient cycle" },
-    { "source": "sea_cucumber", "target": "plankton", "strength": 0.4, "label": "nutrient recycling" },
-    { "source": "juvenile_fish", "target": "adult_fish", "strength": 0.95, "label": "recruitment" },
-    { "source": "adult_fish", "target": "dolphin", "strength": 0.8, "label": "prey" },
-    { "source": "adult_fish", "target": "shark", "strength": 0.7, "label": "prey" },
-    { "source": "juvenile_fish", "target": "sea_turtle", "strength": 0.3, "label": "occasional prey" },
-    { "source": "shark", "target": "adult_fish", "strength": 0.3, "label": "population control" }
+    { "source": "mangrove", "target": "karimeen", "strength": 0.9, "label": "backwater nursery" },
+    { "source": "mangrove", "target": "prawns", "strength": 0.85, "label": "protective habitat" },
+    { "source": "chakara", "target": "fish_stock", "strength": 0.95, "label": "nutrient surge" },
+    { "source": "seagrass", "target": "karimeen", "strength": 0.7, "label": "secondary habitat" },
+    { "source": "seagrass", "target": "turtle", "strength": 0.6, "label": "feeding area" },
+    { "source": "kaka", "target": "chakara", "strength": 0.4, "label": "clears water" },
+    { "source": "karimeen", "target": "fish_stock", "strength": 0.3, "label": "community balance" },
+    { "source": "fish_stock", "target": "dolphin", "strength": 0.8, "label": "prey base" }
   ],
   "cascadeRules": [
-    { "trigger": "coral", "threshold": 60, "affects": ["seagrass", "juvenile_fish", "sea_cucumber"], "delay": 0, "description": "Coral below 60% — immediate habitat loss" },
-    { "trigger": "coral", "threshold": 40, "affects": ["plankton"], "delay": 15, "description": "Severe coral loss disrupts nutrient cycling within 15 days" },
-    { "trigger": "seagrass", "threshold": 50, "affects": ["sea_turtle", "juvenile_fish"], "delay": 10, "description": "Seagrass loss removes nursery habitat" },
-    { "trigger": "juvenile_fish", "threshold": 45, "affects": ["adult_fish"], "delay": 30, "description": "Juvenile collapse → adult stock drops in 30 days" },
-    { "trigger": "adult_fish", "threshold": 35, "affects": ["dolphin", "shark"], "delay": 45, "description": "Fish stock collapse → predators leave or starve in 45 days" }
+    { "trigger": "mangrove", "threshold": 60, "affects": ["karimeen", "prawns"], "delay": 0, "description": "Mangrove cover below 60% — immediate collapse of backwater nurseries" },
+    { "trigger": "chakara", "threshold": 40, "affects": ["fish_stock"], "delay": 7, "description": "Loss of Chakara (Mudbanks) effects commercial sardine stock within 7 days" },
+    { "trigger": "karimeen", "threshold": 45, "affects": ["fish_stock"], "delay": 30, "description": "Native stock collapse → commercial displacement within 30 days" },
+    { "trigger": "fish_stock", "threshold": 35, "affects": ["dolphin"], "delay": 45, "description": "Sardine shortage → predator migration patterns disrupted within 45 days" }
   ],
   "economicImpact": {
     "currency": "INR",
-    "affectedFishermen": 400,
-    "baselineDailyIncome": 2800,
+    "affectedFishermen": 2500,
+    "baselineDailyIncome": 3200,
     "scenarios": [
       { "coralCover": 100, "dailyLossPerFisherman": 0, "totalDailyLoss": 0 },
-      { "coralCover": 80, "dailyLossPerFisherman": 200, "totalDailyLoss": 80000 },
-      { "coralCover": 60, "dailyLossPerFisherman": 800, "totalDailyLoss": 320000 },
-      { "coralCover": 40, "dailyLossPerFisherman": 1600, "totalDailyLoss": 640000 },
-      { "coralCover": 20, "dailyLossPerFisherman": 2400, "totalDailyLoss": 960000 },
-      { "coralCover": 10, "dailyLossPerFisherman": 2800, "totalDailyLoss": 1120000 }
+      { "coralCover": 80, "dailyLossPerFisherman": 400, "totalDailyLoss": 1000000 },
+      { "coralCover": 60, "dailyLossPerFisherman": 1200, "totalDailyLoss": 3000000 },
+      { "coralCover": 40, "dailyLossPerFisherman": 2200, "totalDailyLoss": 5500000 },
+      { "coralCover": 20, "dailyLossPerFisherman": 3200, "totalDailyLoss": 8000000 }
     ]
   }
 }

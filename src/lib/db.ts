@@ -146,19 +146,23 @@ export async function findNearbyReport(
   await ensureTable();
 
   const rows = await sql`
-    SELECT
-      id, latitude, longitude, type, severity, title, description,
-      image_base64 as "imageBase64", timestamp, is_user_report as "isUserReport",
-      (
-        6371000 * acos(
-          cos(radians(${lat})) * cos(radians(latitude)) *
-          cos(radians(longitude) - radians(${lng})) +
-          sin(radians(${lat})) * sin(radians(latitude))
-        )
-      ) AS distance_m
-    FROM reports
-    WHERE timestamp > now() - interval '24 hours'
-    HAVING distance_m < ${radiusMeters}
+    SELECT * FROM (
+      SELECT
+        id, latitude, longitude, type, severity, title, description,
+        image_base64 as "imageBase64", timestamp, is_user_report as "isUserReport",
+        (
+          6371000 * acos(
+            least(1.0, greatest(-1.0, 
+              cos(radians(${lat})) * cos(radians(latitude)) *
+              cos(radians(longitude) - radians(${lng})) +
+              sin(radians(${lat})) * sin(radians(latitude))
+            ))
+          )
+        ) AS distance_m
+      FROM reports
+      WHERE timestamp > now() - interval '24 hours'
+    ) AS sub
+    WHERE distance_m < ${radiusMeters}
     ORDER BY distance_m ASC
     LIMIT 1;
   ` as unknown as (ReportRecord & { distance_m: number })[];

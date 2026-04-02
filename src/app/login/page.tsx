@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, UserRole } from "@/context/AuthContext";
 import { FiShield, FiAnchor, FiUser, FiArrowRight, FiCheckCircle } from "react-icons/fi";
@@ -11,8 +11,13 @@ export default function LoginPage() {
   const router = useRouter();
   const [selectedRole, setSelectedRole] = useState<UserRole>(null);
 
+  useEffect(() => {
+    if (user) {
+      router.push("/dashboard");
+    }
+  }, [user, router]);
+
   if (user) {
-    router.push("/dashboard");
     return null;
   }
 

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { Suspense, useEffect, useState } from "react";
-import { FiCamera, FiTrendingUp } from "react-icons/fi";
+import { FiCamera, FiTrendingUp, FiMaximize2, FiMinimize2 } from "react-icons/fi";
 
 // Dynamically import the map component with SSR disabled
 // as Mapbox/Leaflet depends on window/browser APIs
@@ -54,6 +54,8 @@ export default function MapPage() {
   } | null>(null);
 
   const [isMobile, setIsMobile] = useState(false);
+  const [isSummaryCollapsed, setIsSummaryCollapsed] = useState(false);
+  const [isFeedCollapsed, setIsFeedCollapsed] = useState(false);
 
   useEffect(() => {
     const update = () => {
@@ -98,120 +100,138 @@ export default function MapPage() {
             border: "1px solid var(--border-strong)",
             color: "var(--text-primary)",
             boxShadow: isMobile ? "0 18px 45px rgba(15,23,42,0.32)" : "0 16px 40px rgba(15,23,42,0.18)",
+            transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+            overflow: "hidden",
           }}
         >
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "flex-start" }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div
-                style={{
-                  fontSize: "0.7rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.14em",
-                  color: "var(--text-secondary)",
-                  marginBottom: 4,
-                }}
-              >
-                Live Surface 
-                
-                
-                
-                
-                
-                
-
-                • Kochi Coast
+          <div 
+            style={{ 
+              display: "flex", 
+              justifyContent: "space-between", 
+              gap: 16, 
+              alignItems: "center", 
+              cursor: isMobile ? "default" : "pointer", 
+              userSelect: "none" 
+            }}
+            onClick={() => !isMobile && setIsSummaryCollapsed(!isSummaryCollapsed)}
+          >
+            <div
+              style={{
+                fontSize: "0.7rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.14em",
+                color: "var(--text-secondary)",
+              }}
+            >
+              Live Surface • Kochi Coast
+            </div>
+            {!isMobile && (
+              <div style={{ color: "var(--text-secondary)", opacity: 0.6 }}>
+                {isSummaryCollapsed ? <FiMaximize2 /> : <FiMinimize2 />}
               </div>
-              <h1 style={{ fontSize: "1.05rem", margin: 0, fontWeight: 600 }}>OceanSentinel Marine Intelligence</h1>
-              <p
-                style={{
-                  margin: "6px 0 0 0",
-                  fontSize: "0.8rem",
-                  color: "var(--text-secondary)",
-                  lineHeight: 1.5,
-                }}
-              >
-                River mouth risk, live fishing zones, and citizen anomaly reports streamed into a single operational view.
-              </p>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 150 }}>
-              <Link
-                href="/report"
-                className="btn btn-primary btn-sm"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 6,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                🛡 File Report
-              </Link>
-              <Link
-                href="/detect"
-                className="btn btn-secondary btn-sm"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 6,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                <FiCamera /> AI Scan
-              </Link>
-            </div>
+            )}
           </div>
 
-          <div
-            style={{
-              display: "flex",
-              gap: 8,
-              marginTop: 10,
-              flexWrap: "wrap",
-              fontSize: "0.72rem",
-            }}
-          >
-            <button
-              type="button"
-              className="btn btn-primary btn-sm"
-              onClick={() => setRefreshKey((value) => value + 1)}
+          <div style={{ 
+            maxHeight: isSummaryCollapsed && !isMobile ? "0px" : "1000px", 
+            opacity: isSummaryCollapsed && !isMobile ? 0 : 1,
+            transition: "all 0.4s cubic-bezier(0.83, 0, 0.17, 1)",
+            marginTop: isSummaryCollapsed && !isMobile ? 0 : 14
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "flex-start" }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <h1 style={{ fontSize: "1.05rem", margin: 0, fontWeight: 600 }}>OceanSentinel Marine Intelligence</h1>
+                <p
+                  style={{
+                    margin: "6px 0 0 0",
+                    fontSize: "0.8rem",
+                    color: "var(--text-secondary)",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  River mouth risk, live fishing zones, and citizen anomaly reports streamed into a single operational view.
+                </p>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 150 }}>
+                <Link
+                  href="/report"
+                  className="btn btn-primary btn-sm"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 6,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  🛡 File Report
+                </Link>
+                <Link
+                  href="/detect"
+                  className="btn btn-secondary btn-sm"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 6,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <FiCamera /> AI Scan
+                </Link>
+              </div>
+            </div>
+
+            <div
               style={{
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 6,
-                whiteSpace: "nowrap",
-                minWidth: 120,
+                gap: 8,
+                marginTop: 10,
+                flexWrap: "wrap",
+                fontSize: "0.72rem",
               }}
             >
-              Scan Water
-            </button>
-            <span
-              style={{
-                padding: "4px 9px",
-                borderRadius: 999,
-                background: "rgba(245, 158, 11, 0.08)",
-                border: "1px solid rgba(245, 158, 11, 0.5)",
-                color: "var(--amber)",
-                fontFamily: "var(--font-mono)",
-              }}
-            >
-              Fishing Zones: 5
-            </span>
-            <span
-              style={{
-                padding: "4px 9px",
-                borderRadius: 999,
-                background: "rgba(59, 130, 246, 0.08)",
-                border: "1px solid rgba(59, 130, 246, 0.5)",
-                color: "var(--blue)",
-                fontFamily: "var(--font-mono)",
-              }}
-            >
-              Citizen Reports: Live
-            </span>
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={() => setRefreshKey((value) => value + 1)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                  whiteSpace: "nowrap",
+                  minWidth: 120,
+                }}
+              >
+                Scan Water
+              </button>
+              <span
+                style={{
+                  padding: "4px 9px",
+                  borderRadius: 999,
+                  background: "rgba(245, 158, 11, 0.08)",
+                  border: "1px solid rgba(245, 158, 11, 0.5)",
+                  color: "var(--amber)",
+                  fontFamily: "var(--font-mono)",
+                }}
+              >
+                Fishing Zones: 5
+              </span>
+              <span
+                style={{
+                  padding: "4px 9px",
+                  borderRadius: 999,
+                  background: "rgba(59, 130, 246, 0.08)",
+                  border: "1px solid rgba(59, 130, 246, 0.5)",
+                  color: "var(--blue)",
+                  fontFamily: "var(--font-mono)",
+                }}
+              >
+                Citizen Reports: Live
+              </span>
+            </div>
           </div>
         </div>
 
@@ -226,49 +246,75 @@ export default function MapPage() {
             border: "1px solid var(--border-strong)",
             color: "var(--text-primary)",
             boxShadow: isMobile ? "0 18px 45px rgba(15,23,42,0.32)" : "0 16px 40px rgba(15,23,42,0.18)",
+            transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+            overflow: "hidden",
           }}
         >
-          <div
-            style={{
-              fontSize: "0.72rem",
-              textTransform: "uppercase",
-              letterSpacing: "0.12em",
-              color: "var(--text-secondary)",
-              marginBottom: 10,
+          <div 
+            style={{ 
+              display: "flex", 
+              justifyContent: "space-between", 
+              gap: 10, 
+              alignItems: "center", 
+              cursor: isMobile ? "default" : "pointer", 
+              userSelect: "none" 
             }}
+            onClick={() => !isMobile && setIsFeedCollapsed(!isFeedCollapsed)}
           >
-            Live Feed
+            <div
+              style={{
+                fontSize: "0.72rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                color: "var(--text-secondary)",
+              }}
+            >
+              Live Feed
+            </div>
+            {!isMobile && (
+              <div style={{ color: "var(--text-secondary)", opacity: 0.6 }}>
+                {isFeedCollapsed ? <FiMaximize2 /> : <FiMinimize2 />}
+              </div>
+            )}
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, maxHeight: isMobile ? 180 : 210, overflowY: "auto" }}>
-            {(summary?.feedItems || []).map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => window.dispatchEvent(new CustomEvent("neptune:focus-feed", { detail: item }))}
-                style={{
-                  width: "100%",
-                  textAlign: "left",
-                  padding: "10px 12px",
-                  borderRadius: 12,
-                  background: "rgba(255,255,255,0.9)",
-                  border: "1px solid var(--border-subtle)",
-                  color: "var(--text-primary)",
-                  boxShadow: "0 8px 20px rgba(15,23,42,0.08)",
-                  cursor: "pointer",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
-                  <strong style={{ fontSize: "0.86rem" }}>{item.title}</strong>
-                  <span style={{ fontSize: "0.68rem", color: "var(--text-secondary)", whiteSpace: "nowrap" }}>{item.meta}</span>
-                </div>
-                <div style={{ marginTop: 4, fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.45 }}>
-                  {item.detail}
-                </div>
-                <div style={{ marginTop: 6, fontSize: "0.72rem", color: "var(--teal)", fontWeight: 600 }}>
-                  Click to learn more
-                </div>
-              </button>
-            ))}
+          
+          <div style={{ 
+            maxHeight: isFeedCollapsed && !isMobile ? "0px" : "500px", 
+            opacity: isFeedCollapsed && !isMobile ? 0 : 1,
+            transition: "all 0.4s cubic-bezier(0.83, 0, 0.17, 1)",
+            marginTop: isFeedCollapsed && !isMobile ? 0 : 12
+          }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, maxHeight: isMobile ? 180 : 250, overflowY: "auto" }}>
+              {(summary?.feedItems || []).map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => window.dispatchEvent(new CustomEvent("neptune:focus-feed", { detail: item }))}
+                  style={{
+                    width: "100%",
+                    textAlign: "left",
+                    padding: "10px 12px",
+                    borderRadius: 12,
+                    background: "rgba(255,255,255,0.9)",
+                    border: "1px solid var(--border-subtle)",
+                    color: "var(--text-primary)",
+                    boxShadow: "0 8px 20px rgba(15,23,42,0.08)",
+                    cursor: "pointer",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
+                    <strong style={{ fontSize: "0.86rem" }}>{item.title}</strong>
+                    <span style={{ fontSize: "0.68rem", color: "var(--text-secondary)", whiteSpace: "nowrap" }}>{item.meta}</span>
+                  </div>
+                  <div style={{ marginTop: 4, fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.45 }}>
+                    {item.detail}
+                  </div>
+                  <div style={{ marginTop: 6, fontSize: "0.72rem", color: "var(--teal)", fontWeight: 600 }}>
+                    Click to learn more
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>

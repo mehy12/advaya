@@ -217,9 +217,6 @@ export default function AnalysisResult({ result, imageBase64, selectedLocation, 
         </div>
 
         <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
-          <Link href="/tracer" className="btn btn-secondary btn-sm" style={{ flex: 1 }}>
-            <FiTrendingUp /> Run Reverse Trace
-          </Link>
           <Link href="/biodiversity" className="btn btn-secondary btn-sm" style={{ flex: 1 }}>
             <FiActivity /> Predict Biodiversity Impact
           </Link>

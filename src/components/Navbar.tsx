@@ -16,7 +16,6 @@ export default function Navbar() {
     { name: "Live Map", href: "/map", icon: <FiMap /> },
     { name: "Report", href: "/report", icon: <FiShield /> },
     { name: "AI Detector", href: "/detect", icon: <FiCamera /> },
-    { name: "Tracer", href: "/tracer", icon: <FiTrendingUp /> },
     { name: "Biodiversity", href: "/biodiversity", icon: <FiActivity /> },
     { name: "Dashboard", href: "/dashboard", icon: <FiAward /> },
     { name: "Ledger", href: "/ledger", icon: <FiBookOpen /> },

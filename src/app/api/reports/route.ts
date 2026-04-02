@@ -61,9 +61,17 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(record, { status: 201 });
-  } catch (error) {
-    console.error("POST /api/reports failed", error);
-    return NextResponse.json({ error: "Failed to create report" }, { status: 500 });
+  } catch (error: any) {
+    console.error("POST /api/reports failed:", error);
+    // Return the actual error message in development for easier debugging
+    return NextResponse.json(
+      { 
+        error: "Failed to create report", 
+        message: error?.message || "Internal Server Error",
+        detail: error?.detail || null
+      }, 
+      { status: 500 }
+    );
   }
 }
 

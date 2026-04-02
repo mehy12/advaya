@@ -21,6 +21,7 @@
   border-radius: 0 !important;
   /* Force Sharp */
   backdrop-filter: none !important;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .panelTitle {
@@ -104,6 +105,7 @@
   box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
   border-radius: 20px;
   width: 260px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .legendItem {
@@ -118,4 +120,72 @@
 
 .legendItem:last-child {
   margin-bottom: 0;
+}
+
+/* Collapsible Panel Enhancements */
+.collapsiblePanel {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.panelHeader {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.04);
+  color: #64748b;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.toggleBtn:hover {
+  background: rgba(15, 23, 42, 0.08);
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+
+.panelContent {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 1200px;
+  opacity: 1;
+  transform: translateY(0);
+  margin-top: 16px;
+}
+
+.collapsedContent {
+  max-height: 0 !important;
+  opacity: 0 !important;
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  pointer-events: none;
+  transform: translateY(-10px);
+}
+
+/* Specific overrides for minimized state */
+.minimizedCard {
+  max-width: 240px !important;
+}
+
+.legend.minimized {
+  width: 180px;
+  padding: 14px 18px;
+}
+
+.layerPanel.minimized {
+  width: 180px;
+  padding: 14px 18px;
 }
